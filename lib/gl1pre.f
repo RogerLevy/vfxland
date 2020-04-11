@@ -22,7 +22,7 @@ finit
 
 \ ------------------------------------------------------------------------
 
-include allegro-5.2.3.f
+include allegro-5.2.5.f
 require lib/fclean.f
 : require  get-order depth >R fclean -order require depth R> >
     abort"  Stack item(s) left behind" set-order ;
@@ -90,7 +90,7 @@ value /screen
 : check  0= abort" Allegro init error" ;
 
 : init-allegro
-    $5020300 0 al_install_system check
+    ALLEGRO_VERSION 0 al_install_system check
     
     al_init_image_addon check
     al_init_native_dialog_addon check
