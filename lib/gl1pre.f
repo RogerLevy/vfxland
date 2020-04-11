@@ -30,8 +30,8 @@ require lib/fclean.f
 320 value vieww
 240 value viewh
 0 value display
-create kbs0 /ALLEGRO_KEYBOARD_STATE allot&erase
-create kbs1 /ALLEGRO_KEYBOARD_STATE allot&erase
+create kbs0 1024 allot&erase
+create kbs1 1024 allot&erase
 create ms0 /ALLEGRO_MOUSE_STATE allot&erase
 create ms1 /ALLEGRO_MOUSE_STATE allot&erase
 create ms2 /ALLEGRO_MOUSE_STATE allot&erase
@@ -451,3 +451,5 @@ dev [if]
         ( i zstr ) mtime@ swap bmp-mtime !
     ;
 [then]
+
+synonym turnkey save

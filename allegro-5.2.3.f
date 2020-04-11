@@ -3404,7 +3404,7 @@ extern "C" void al_use_transform( void * m );
 \ extern "C" al_vfprintf( );
 \ extern "C" al_wait_cond( );
 \ extern "C" al_wait_cond_until( );
-\ extern "C" al_wait_for_event( );
+extern "C" void al_wait_for_event( void * queue, void * event );
 \ extern "C" al_wait_for_event_timed( );
 \ extern "C" al_wait_for_event_until( );
 \ extern "C" al_wait_for_vsync( );
