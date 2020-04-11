@@ -1,25 +1,72 @@
+0 value timer
 : shutdown
     deinit
     al_uninstall_system
 ;
 : empty  shutdown empty ;
+\ : read-mouse
+\     etype case
+\         ALLEGRO_EVENT_MOUSE_AXES of
+\             alevt MOUSE_EVENT.dx 2@ or if
+\                 alevt MOUSE_EVENT.x @
+\                 alevt MOUSE_EVENT.y @ 2dup to mousey to mousex
+\                 ms2 ALLEGRO_MOUSE_STATE.y ! ms2 ALLEGRO_MOUSE_STATE.x !
+\             then
+\ \            alevt MOUSE_EVENT.dz 2@ or if
+\ \                alevt MOUSE_EVENT.z 2@ to mwheelx to mwheely
+\ \            then
+\         endof
+\         ALLEGRO_EVENT_MOUSE_BUTTON_DOWN of
+\             alevt MOUSE_EVENT.button @ case
+\                 1 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 1 or swap ! endof
+\                 2 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 2 or swap ! endof
+\                 3 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 4 or swap ! endof
+\             endcase
+\         endof
+\         ALLEGRO_EVENT_MOUSE_BUTTON_UP of
+\             alevt MOUSE_EVENT.button @ case
+\                 1 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 1 invert and swap ! endof
+\                 2 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 2 invert and swap ! endof
+\                 3 of ms2 ALLEGRO_MOUSE_STATE.buttons dup @ 4 invert and swap ! endof
+\             endcase
+\         endof        
+\     endcase
+\ ;
+: frame
+    kbs0 kbs1 /ALLEGRO_KEYBOARD_STATE move
+    kbs0 al_get_keyboard_state
+    ms0 ms1 /ALLEGRO_MOUSE_STATE move
+\    ms2 ms0 /ALLEGRO_MOUSE_STATE move
+    ms0 al_get_mouse_state
+    me >r step r> to me
+    [ dev ] [if] me >r system r> to me [then]
+    me >r update r> to me
+    display al_flip_display
+    [ dev ] [if] pause [then]
+ ;
+: (go)
+    begin
+        queue alevt al_get_next_event if
+            etype ALLEGRO_EVENT_TIMER = if
+                frame
+                kbs0 59 al_key_down if exit then
+            then
+            \ read-mouse
+            me >r pump r> to me
+        then
+\        pause
+    again
+;
 : go
     kbs0 /ALLEGRO_KEYBOARD_STATE erase
     kbs1 /ALLEGRO_KEYBOARD_STATE erase
     al_uninstall_keyboard  al_install_keyboard drop
     queue al_get_keyboard_event_source al_register_event_source
-    begin
-        me >r update r> to me
-        display al_flip_display
-        [ dev ] [if] pause [then]
-        kbs0 kbs1 /ALLEGRO_KEYBOARD_STATE move
-        kbs0 al_get_keyboard_state
-        ms0 ms1 /ALLEGRO_MOUSE_STATE move
-        ms0 al_get_mouse_state
-        [ dev ] [if] system [then]
-        \ begin queue alevt al_get_next_event while pump repeat
-        me >r step r> to me
-    kbs0 59 al_key_down until
+    display al_flip_display
+    1e 60e f/ al_create_timer dup al_start_timer to timer
+    queue timer al_get_timer_event_source al_register_event_source
+    (go)
+    timer al_destroy_timer
     [ fullscreen ] [if] shutdown bye [then]
 ;
 : init
